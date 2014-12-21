@@ -169,4 +169,6 @@ else
 	echo "Seems there is issue to create the log tar file"
 fi
 ### send tar log file to remote/ nfs server
-
+# and put this script on server
+# refer bugzilla for log files
+# usage of case: could have 
