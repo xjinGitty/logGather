@@ -14,10 +14,14 @@
 #####################################################################################################################################################
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 VDATE=`date +%y%m%d-%H.%M.%S`
+VHOST=`hostname`
+ACOMPO=["installer","firefox","yast2","printer","network","x11","thunderbird","pidgin","samba","nfs","evolution","libreoffice","gnome"]
+ASCENA=["boot","update","upgrade","migration"]
+nfsServer="147.2.207.135"
 
 function printOption(){
 echo -e "
-usage: logcol -[options] (components)  
+usage: logcol -[options] (components|scenarios)  
 options: 
 \t -h: will print this options manual  
 
@@ -30,7 +34,10 @@ components:
 \t x11: this will collect log files related with graphical issue
 
 scenaros: 
-\t boot: this wil collect log files for debugging issue happens during boot\n"
+\t boot: this wil collect log files for debugging issue happens during boot
+
+This script support to upload the collected log.tar.gz file to NFS server, during script running, will ask you select as YES or NO
+"
 }
 
 #####################################################################################################################################################
@@ -41,13 +48,11 @@ if [ "$1" == "" ]; then
 	printOption && exit 0
 elif [ "$1" == "-h" ]; then
 	printOption && exit 0
+elif [[ "${ACOMPO[@]}" =~ "$1" ]]||[[ "${ASCENA[@]}" =~ "$1" ]]; then
+	echo -e "Begin to collect log files, pls wait..."
 else
-	if [ "$1" == "installer" ]||[ "$1" == "firefox" ]||[ "$1" == "yast2" ]||[ "$1" == "printer" ]||[ "$1" == "network" ]||[ "$1" == "boot" ]||[ "$1" == "x11" ]; then
-		echo -e "Begin to collect log files, pls wait..."
-	else
-		echo -e "Pls check your input, now the supported components or scenarios pls find below: \n"
-		printOption && exit 0
-	fi
+	echo -e "Invalid input, pls double check it..."
+	exit 0
 fi
 
 #####################################################################################################################################################
@@ -56,7 +61,7 @@ fi
 ### make directory to store log files
 if [ -d logFileD ]; then
 	rm -rf logFileD
-	echo "Removed the exist folder for log files!"
+	echo "Removed the old folder used for store log files!"
 fi
 mkdir logFileD; cd logFileD
 
@@ -85,12 +90,12 @@ echo -n "netcardInfo, "
 echo -e "\nVGA info: \n" >> generalInfo.txt
 lspci -nnk |grep -n -A3 "VGA" >> generalInfo.txt
 echo -n "and VGAinfo has been collected. 
-Pls refer generalInfo.txt file for details. 
+Pls refer generalInfo.txt under logFileD folder for details. 
 
 "
 #####################################################################################################################################################
 ##### dealing with the specific components log file
-#####################################################################################################################################################
+##################################################################################################################################################### 
 ### functions declaration:
 function gety2log(){
 	if [ -f /var/log/YaST2/y2log ]; then
@@ -119,21 +124,25 @@ case $1	in
 "installer")
 	cp /var/log/pbl.log .
 	journalctl -b > journal.txt
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected.
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
 
 "firefox")
-	echo -e "\n \t firefox related logs will be collected, you could refer to [http://fedoraproject.org/wiki/How_to_debug_Firefox_problems] for a little deep debugging to make sure issue you met was a real problem:)"
+	echo -e "\n \t firefox related logs will be collected, you could refer to [http://fedoraproject.org/wiki/How_to_debug_Firefox_problems] \
+	for a little deep debugging to make sure issue you met was a real problem:)"
 	# about:support will be helpful for issue debuging
 	# cp /var/log/
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected.
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
 
 "yast2")
 	gety2log
 	getzypplog
 	journal -b > journal.txt
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected.
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
 
 "printer")
@@ -142,33 +151,73 @@ case $1	in
 	fi
 	journalctl -b > journal.txt
 	gety2log
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected.
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
 
 "network")
 	ifconfig >ifconfigInfo.txt
 	journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected.
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
 "x11")
 	# configuration info should be provided???
-	echo `tar -zcvf log-${VDATE}.tar.gz *` has been collected	
+	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.	
+	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 	;;
+*)
+	echo "specific log file colletion for component $1 is not implementted, you could ask xjin for it"
+	;;
+
 esac
 
-#####################################################################################################################################################
-##### remove temporary created log files and send tar log to remote server
-#####################################################################################################################################################
-### rm all log files
-if [ -f log-${VDATE}.tar.gz ]; then
-	mv log-${VDATE}.tar.gz ../.
+### remove temporary created log files directory
+if [ -f ${VHOST}-log-${VDATE}.tar.gz ]; then
+	mv ${VHOST}-log-${VDATE}.tar.gz ../.
 	cd ..
 	rm -rf logFileD
-	echo "Temporary log files has been deleted"
 else
-	echo "Seems there is issue to create the log tar file"
+### the input checking has been placed at the beginning.
+## could consider: when the input is in the [all components] list, then do not remove the log file directory to let user use this script to gather the general info
+#	if [ $1 in xxx ]; then
+#		exit 0
+#	else
+## and when the input is total invalid charactor, just exit
+#		rm -rf logFileD
+#	fi
+	exit
 fi
-### send tar log file to remote/ nfs server
-# and put this script on server
-# refer bugzilla for log files
-# usage of case: could have 
+
+#####################################################################################################################################################
+##### send tar log file to remote server (nfs is using)
+#####################################################################################################################################################
+### check for the remote nfs server and upload log file
+echo -e "\n"
+read -p "Do you like to upload this log file to nfs server? [Y/N]" VUPLOAD
+if [ "${VUPLOAD}" == "N" -o ${VUPLOAD} == "n" ]; then
+	exit 0
+elif [ "${VUPLOAD}" == "Y" -o ${VUPLOAD} == "y" ]; then
+	echo "Pls wait, uploading..."
+	if [ -d temp4log ]; then
+		echo "There is folder named temp4log in your working directory, which will be used for uploading log file to nfs server..."
+		echo "For not mix works, Pls rename your temp4log directory temporary and rerun this script, \
+			after log collection is done, you could rename it back:)"
+		exit 0
+	else
+		mkdir temp4log
+		if [ `which showmount` ];then 
+			mount ${nfsServer}:`showmount -e ${nfsServer}|grep Dir4log|cut -d ' ' -f1` temp4log
+			sleep 3
+			cp ${VHOST}-log-${VDATE}.tar.gz temp4log/.
+			umount temp4log
+			echo "${VHOST}-log-${VDATE}.tar.gz has been upload to NFS server: ${nfsServer}:/share/nfs/Dir4log"
+		else
+			echo "Not sure if we have NFS server"
+		fi
+		
+		rm -rf temp4log
+	fi
+else
+	echo "I don't know your input, will not upload log file to nfs server..."
+fi
