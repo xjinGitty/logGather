@@ -121,7 +121,7 @@ function getzypplog(){
 
 ### components case
 case $1	in 
-"installer")
+"installer" | "boot")
 	cp /var/log/pbl.log .
 	journalctl -b > journal.txt
 	echo `tar -zcvf ${VHOST}-log-${VDATE}.tar.gz *` has been collected.
@@ -195,9 +195,9 @@ fi
 ### check for the remote nfs server and upload log file
 echo -e "\n"
 read -p "Do you like to upload this log file to nfs server? [Y/N]" VUPLOAD
-if [ "${VUPLOAD}" == "N" -o ${VUPLOAD} == "n" ]; then
+if [ "${VUPLOAD}" == "N" -o "${VUPLOAD}" == "n" ]; then
 	exit 0
-elif [ "${VUPLOAD}" == "Y" -o ${VUPLOAD} == "y" ]; then
+elif [ "${VUPLOAD}" == "Y" -o "${VUPLOAD}" == "y" ]; then
 	echo "Pls wait, uploading..."
 	if [ -d temp4log ]; then
 		echo "There is folder named temp4log in your working directory, which will be used for uploading log file to nfs server..."
