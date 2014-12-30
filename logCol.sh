@@ -14,8 +14,10 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 VDATE=`date +%y%m%d-%H.%M.%S`
 VHOST=`hostname`
-ACOMPO=["installer","firefox","yast2","printer","network","x11","thunderbird","pidgin","samba","nfs","evolution","libreoffice","gnome"]
-ASCENA=["boot","update","upgrade","migration"]
+for x in `cat /etc/issue|egrep [[:digit:]]`
+do
+	echo -e "Current os version is ${x}" |egrep [[:digit:]] && VPRODUCT=${x} && break
+done
 nfsServer="147.2.207.135"
 
 function printOption(){
@@ -73,7 +75,7 @@ function tarLandFb(){
 ### components case
 case $1	in 
 "")
-	echo -e "Input should not be empty, refer to the usage below:  \n"
+	echo -e "To gather log files, input should not be empty, refer to the usage below:  \n"
 	printOption && exit 0
 	;;
 "-h")
@@ -123,8 +125,10 @@ case $1	in
 	"
 	case $1 in
 	"installer" | "boot")
-			cp /var/log/pbl.log .
-		journalctl -b > journal.txt
+		cp /var/log/pbl.log .
+		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+			journalctl -b > journal.txt
+		fi
 		tarLandFb
 		;;
 
@@ -139,7 +143,9 @@ case $1	in
 	"yast2")
 		gety2log
 		getzypplog
-		journal -b > journal.txt
+		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+			journalctl -b > journal.txt
+		fi
 		tarLandFb
 		;;
 
@@ -147,14 +153,18 @@ case $1	in
 		if [ -d /var/log/cups ]; then
 			cp -a /var/log/cups cups
 		fi
-		journalctl -b > journal.txt
+		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+			journalctl -b > journal.txt
+		fi
 		gety2log
 		tarLandFb
 		;;
 
 	"network")
 		ifconfig >ifconfigInfo.txt
-		journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
+		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+			journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
+		fi
 		tarLandFb
 		;;
 	"x11")
@@ -188,6 +198,7 @@ if [ "${VUPLOAD}" == "N" -o "${VUPLOAD}" == "n" ]; then
 elif [ "${VUPLOAD}" == "Y" -o "${VUPLOAD}" == "y" ]; then
 	echo "Pls wait, uploading..."
 	mkdir ${VDATE}temp4log
+	echo "temp dir is ${VDATE}temp4log"
 	if [ `which showmount` ];then 
 		mount ${nfsServer}:`showmount -e ${nfsServer}|grep Dir4log|cut -d ' ' -f1` ${VDATE}temp4log
 		sleep 3
