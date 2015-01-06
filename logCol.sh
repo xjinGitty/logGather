@@ -16,8 +16,9 @@ VDATE=`date +%y%m%d-%H.%M.%S`
 VHOST=`hostname`
 for x in `cat /etc/issue|egrep [[:digit:]]`
 do
-	echo -e "Current os version is ${x}" |egrep [[:digit:]] && VPRODUCT=${x} && break
+	echo -e "Current os version is ${x} \n" |egrep [[:digit:]] && VPRODUCT=${x} && break
 done
+VJOURNAL=`[ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ] && echo "1" || echo "0" `
 nfsServer="147.2.207.135"
 
 function printOption(){
@@ -72,6 +73,11 @@ function tarLandFb(){
 	echo "Pls find in ${VHOST}-log-${VDATE}.tar.gz"
 }
 
+function printInfo(){
+	echo -e "$1: \n" > generalInfo.txt
+	echo -n "$1, "
+}
+
 ### components case
 case $1	in 
 "")
@@ -85,15 +91,9 @@ case $1	in
 	### make directory to store log files
 	if [ -d logFileD ]; then
 		rm -rf logFileD
-		echo "Removed the old folder used for store log files!"
+		echo -e "Removed the old folder used for store log files! \n"
 	fi
 	mkdir logFileD; cd logFileD
-
-	### function declaration
-	function printInfo(){
-		echo -e "$1: \n" > generalInfo.txt
-		echo -n "$1, "
-	}
 
 	### general system and hardware info collection
 	## cpuInfo
@@ -119,14 +119,13 @@ case $1	in
 	##adding your session here
 	##...
 
-	echo -n " has been collected. 
-	Pls refer generalInfo.txt under logFileD folder for details. 
+	echo -n "could be found in generalInfo.txt." 
+	echo -e "\n"
 
-	"
 	case $1 in
 	"installer" | "boot")
 		cp /var/log/pbl.log .
-		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+		if [ $VJOURNAL ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -136,14 +135,16 @@ case $1	in
 		echo -e "\n \t firefox related logs will be collected, you could refer to [http://fedoraproject.org/wiki/How_to_debug_Firefox_problems] \
 		for a little deep debugging to make sure issue you met was a real problem:)"
 		# about:support will be helpful for issue debuging
-		# cp /var/log/
+		if [ -d ~/.mozilla ]; then
+			cp -a ~/.mozilla/. .
+		fi
 		tarLandFb
 		;;
 
 	"yast2")
 		gety2log
 		getzypplog
-		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+		if [ $VJOURNAL ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -153,7 +154,7 @@ case $1	in
 		if [ -d /var/log/cups ]; then
 			cp -a /var/log/cups cups
 		fi
-		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+		if [ $VJOURNAL ]; then
 			journalctl -b > journal.txt
 		fi
 		gety2log
@@ -162,13 +163,19 @@ case $1	in
 
 	"network")
 		ifconfig >ifconfigInfo.txt
-		if [ "${VPRODUCT}" == "12" -o "${VPRODUCT}" == "13.1" -o "${VPRODUCT}" == "13.2" ];then
+		if [ $VJOURNAL ]; then
 			journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
 		fi
 		tarLandFb
 		;;
 	"x11")
-		# configuration info should be provided???
+		if [ -f /etc/X11/xorg.conf ]; then
+			cp /etc/X11/xorg.conf .
+		else
+			echo -e "xorg.conf not existed, pls run 'Xorg -configure' in level 3 to create it."
+			echo -e "And move the created /root/xorg.conf.new to /etc/X11/xorg.conf. Then re-try."
+			exit 0
+		fi
 		tarLandFb
 		;;
 	*)
