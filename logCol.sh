@@ -172,9 +172,11 @@ case $1	in
 		if [ -f /etc/X11/xorg.conf ]; then
 			cp /etc/X11/xorg.conf .
 		else
-			echo -e "xorg.conf not existed, pls run 'Xorg -configure' in level 3 to create it."
-			echo -e "And move the created /root/xorg.conf.new to /etc/X11/xorg.conf. Then re-try."
-			exit 0
+#			echo -e "xorg.conf not existed, pls run 'Xorg -configure' in level 3 to create it."
+#			echo -e "And move the created /root/xorg.conf.new to /etc/X11/xorg.conf. Then re-try."
+#			exit 0
+			Xorg :1 -configure > /dev/null 2>&1
+			cp /root/xorg.conf.new xorg.conf
 		fi
 		tarLandFb
 		;;
