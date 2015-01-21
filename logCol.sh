@@ -125,7 +125,7 @@ case $1	in
 	case $1 in
 	"installer" | "boot")
 		cp /var/log/pbl.log .
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -144,7 +144,7 @@ case $1	in
 	"yast2")
 		gety2log
 		getzypplog
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -154,7 +154,7 @@ case $1	in
 		if [ -d /var/log/cups ]; then
 			cp -a /var/log/cups cups
 		fi
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		gety2log
@@ -163,7 +163,7 @@ case $1	in
 
 	"network")
 		ifconfig >ifconfigInfo.txt
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
 		fi
 		tarLandFb
