@@ -115,6 +115,8 @@ case $1	in
 	## VGA
 	printInfo VGAinfo
 	lspci -nnk |grep -n -A3 "VGA" >> generalInfo.txt
+	## dmesg
+	dmesg > dmesg.txt
 	##...
 	##adding your session here
 	##...
