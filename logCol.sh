@@ -115,6 +115,8 @@ case $1	in
 	## VGA
 	printInfo VGAinfo
 	lspci -nnk |grep -n -A3 "VGA" >> generalInfo.txt
+	## dmesg
+	dmesg > dmesg.txt
 	##...
 	##adding your session here
 	##...
@@ -125,7 +127,7 @@ case $1	in
 	case $1 in
 	"installer" | "boot")
 		cp /var/log/pbl.log .
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -144,7 +146,7 @@ case $1	in
 	"yast2")
 		gety2log
 		getzypplog
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		tarLandFb
@@ -154,7 +156,7 @@ case $1	in
 		if [ -d /var/log/cups ]; then
 			cp -a /var/log/cups cups
 		fi
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -b > journal.txt
 		fi
 		gety2log
@@ -163,7 +165,7 @@ case $1	in
 
 	"network")
 		ifconfig >ifconfigInfo.txt
-		if [ $VJOURNAL ]; then
+		if [ $VJOURNAL == 1 ]; then
 			journalctl -u NetworkManager-dispatcher.service -u NetworkManager.service > network.txt
 		fi
 		tarLandFb
@@ -172,9 +174,11 @@ case $1	in
 		if [ -f /etc/X11/xorg.conf ]; then
 			cp /etc/X11/xorg.conf .
 		else
-			echo -e "xorg.conf not existed, pls run 'Xorg -configure' in level 3 to create it."
-			echo -e "And move the created /root/xorg.conf.new to /etc/X11/xorg.conf. Then re-try."
-			exit 0
+#			echo -e "xorg.conf not existed, pls run 'Xorg -configure' in level 3 to create it."
+#			echo -e "And move the created /root/xorg.conf.new to /etc/X11/xorg.conf. Then re-try."
+#			exit 0
+			Xorg :1 -configure > /dev/null 2>&1
+			cp /root/xorg.conf.new xorg.conf
 		fi
 		tarLandFb
 		;;
