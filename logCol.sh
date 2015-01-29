@@ -14,6 +14,10 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 VDATE=`date +%y%m%d-%H.%M.%S`
 VHOST=`hostname`
+if [ $(whoami) != "root" ]; then
+echo "you should use root account to run this script" && exit 1
+fi
+
 for x in `cat /etc/issue|egrep [[:digit:]]`
 do
 	echo -e "Current os version is ${x} \n" |egrep [[:digit:]] && VPRODUCT=${x} && break
