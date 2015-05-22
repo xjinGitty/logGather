@@ -1,16 +1,12 @@
 #! /bin/bash
-#####################################################################################################################################################
 ##### this simple script is used for automatically collecting log files when issue show up, hope could help you for the bug rephrting 
 # History:
 ## original ver: v1.0
 ## author: xjin (xjin@suse.com)
 ## from: 2014-12-18
-#####################################################################################################################################################
 
 
-#####################################################################################################################################################
 ##### variables and options declaration
-#####################################################################################################################################################
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 VDATE=`date +%y%m%d-%H.%M.%S`
 VHOST=`hostname`
@@ -28,12 +24,13 @@ options:
 \t -h: will print this options manual  
 
 components: 
-\t instaler: this will collect log when you would like to report bugs related with installer
-\t firefox: this will collect log files related with firefox component 
-\t yast2: this will collect both yast2 and zypper related log files 
-\t printer: this will collect log files for printer issue 
-\t network: this will collect log files for network issue
-\t x11: this will collect log files related with graphical issue
+\t instaler: when you would like to report bugs related with installer
+\t firefox: log files related with firefox component 
+\t yast2:  both yast2 and zypper related log files 
+\t printer: log files for printer issue 
+\t network: log files for network issue
+\t x11: log files related with graphical issue
+\t sysInfo: collect system general information
 
 scenaros: 
 \t boot: this wil collect log files for debugging issue happens during boot
@@ -42,9 +39,7 @@ This script support to upload the collected log.tar.gz file to NFS server, durin
 "
 }
 
-#####################################################################################################################################################
 ##### specific components log file collection
-##################################################################################################################################################### 
 ### functions declaration:
 function gety2log(){
 	if [ -f /var/log/YaST2/y2log ]; then
@@ -109,6 +104,9 @@ case $1	in
 	## osInfo
 	printInfo OSinfo
 	cat /etc/YaST2/build >> generalInfo.txt
+	## kernel version
+	printInfo KernelVer
+	uname -a >> generalInfo.txt
 	## mountInfo
 	printInfo MOUNTinfo
 	mount >> generalInfo.txt
@@ -186,6 +184,9 @@ case $1	in
 		fi
 		tarLandFb
 		;;
+	"sysInfo")
+		tarLandFb
+		;;
 	*)
 		echo "specific log file colletion for component $1 is not implementted, you could ask xjin for it"
 		;;
@@ -202,9 +203,7 @@ else
 	exit 0
 fi
 
-#####################################################################################################################################################
 ##### send tar log file to remote server (nfs is using)
-#####################################################################################################################################################
 ### check for the remote nfs server and upload log file
 echo -e "\n"
 read -p "Do you like to upload this log file to nfs server? [Y/N]" VUPLOAD
