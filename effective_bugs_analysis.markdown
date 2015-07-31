@@ -42,26 +42,27 @@ _Including all the resolutions like "INVALID,WONTFIX,DUPLICATE,WORKSFORME,FEATUR
 **Quantities**
 |               | SLED11SP3 | SLED12 | SLED11SP4 |
 | ------------- | --------- | ------ | --------- |
-| Total         | 69        | 167    |         |
-| Enhancement   | 0         | 25     |         |
+| Total         | 76        | 167    | 52        |
+| Enhancement   | 0         | 25     | 2         |
                                                   
 **Percentage**                                    
 |               | SLED11SP3 | SLED12 | SLED11SP4 |
 | ------------- | --------- | ------ | --------- |
-| Enhancement   | 0         | 14.9%  |         |
+| Enhancement   | 0         | 14.9%  | 3.84%     |
                                                   
 ### Resolution                                    
                                                   
 **Quantities**                                    
 |               | SLED11SP3 | SLED12 | SLED11SP4 |
 | ------------- | --------- | ------ | --------- |
-| Total         | 69        | 167    |         |
-| DUPLICATE     | 5         | 29     |         |
-| INVALID       | 11        | 10     |         |
-| WONTFIX       | 1         | 3      |         |
-| WORKSFORME    | 3         | 4      |         |
+| Total         | 76        | 167    | 52        |
+| DUPLICATE     | 5         | 29     | 5         |
+| INVALID       | 12        | 10     | 5         |
+| WONTFIX       | 3         | 3      | 4         |
+| WORKSFORME    | 4         | 4      | 2         |
+| FEATURE       | 2         | 2      | 2         |
                                                   
-**Percentage**                                    
+**Percentage**???                                    
 |               | SLED11SP3 | SLED12 | SLED11SP4 |
 | ------------- | --------- | ------ | --------- |
 | DUPLICATE     | 7.2%      | 17.3%  |     |
@@ -71,32 +72,34 @@ _Including all the resolutions like "INVALID,WONTFIX,DUPLICATE,WORKSFORME,FEATUR
 | FEATURE       | 4.3%      | 2.3%   |     |
 
 ### Ineffective Bugs in Components
-_Excluding Enhansment_
+_Excluding Enhancement_
 
 #### Components in the ineffective Bugs
 
 |                      | SLED11SP3 | SLED12    | SLED11SP4 | 
 | -------------------- | --------- | --------- | --------- | 
-| Total                | 20        | 46        |  | 
-| Installer            | 2   10%   | 20  43.4% |  | 
-| Basesystem           |           | 5   10.8% |  | 
-| GNOME                | 4   20%   | 2   4.3%  |  | 
-| Network              | 2   10%   | 2   4.3%  |  | 
-| YaST2                |           | 2   4.3%  |  | 
-| Kernel               | 1   5%    | 2   4.3%  |  | 
-| Other                | 3   15%   | 2   4.3%  |  | 
-| X Server             |           | 2   4.3%  |  | 
-| Update Problems      |           | 1   2.1%  |  | 
-| Registration         | 1   5%    | 1   2.1%  |  | 
-| Samba                |           | 1   2.1%  |  | 
-| Printing             |           | 1   2.1%  |  | 
-| Packages             | 2   10%   | 1   2.1%  |  | 
-| libzypp              |           | 1   2.1%  |  | 
-| XEN:Save/Restore/Mig | 1   5%    |           |  | 
-| Evolution            | 1   5%    | 1   2.1%  |  | 
-| Firefox              | 3   15%   |           |  | 
-| Console Applications |           | 1   2.1%  |  | 
-| Artwork&Branding     |           | 1   2.1%  |  | 
+| Total                | 20        | 46        |    18     | 
+| Installer/ ~tion     | 2   10%   | 20  43.4% |    2      | 
+| Basesystem           |           | 5   10.8% |    1      | 
+| GNOME                | 4   20%   | 2   4.3%  |    2      | 
+| Network              | 2   10%   | 2   4.3%  |           | 
+| YaST2                |           | 2   4.3%  |    3      | 
+| Kernel               | 1   5%    | 2   4.3%  |    2      | 
+| Other                | 3   15%   | 2   4.3%  |           | 
+| X Server             |           | 2   4.3%  |           | 
+| Update Problems      |           | 1   2.1%  |           | 
+| Registration         | 1   5%    | 1   2.1%  |           | 
+| Samba                |           | 1   2.1%  |           | 
+| Printing             |           | 1   2.1%  |    1      | 
+| Packages             | 2   10%   | 1   2.1%  |           | 
+| libzypp              |           | 1   2.1%  |           | 
+| XEN:Save/Restore/Mig | 1   5%    |           |    1      | 
+| Evolution            | 1   5%    | 1   2.1%  |    1      | 
+| Firefox              | 3   15%   |           |           | 
+| Console Applications |           | 1   2.1%  |           | 
+| Artwork&Branding     |           | 1   2.1%  |           | 
+| Banshee              |           | 1   2.1%  |    2      | 
+| Legal issue          |           | 1   2.1%  |    1      | 
                                                              
                                                              
 #### Ineffective Bugs in Components              Components
