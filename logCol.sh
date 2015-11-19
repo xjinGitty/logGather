@@ -227,3 +227,6 @@ elif [ "${VUPLOAD}" == "Y" -o "${VUPLOAD}" == "y" ]; then
 else
 	echo "I don't know your input, will not upload log file to nfs server..."
 fi
+
+
+# add for migration scenario:
